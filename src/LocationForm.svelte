@@ -2,6 +2,10 @@
 import { Form, Input } from 'sveltejs-forms';
 import * as yup from 'yup';
 
+  import { getPosition } from './utils/helper'
+
+let location;
+
 const handleSubmit = ({ detail: { values, setSubmitting, resetForm } }) => {
   setTimeout(() => {
     console.log(values);
@@ -19,6 +23,9 @@ const schema = yup.object().shape({
   message: yup.string().required()
 })
 
+const getLocation = () => {
+  naviagor.geoLocation.getCurrentPosition
+}
 </script>
 
 <Form
@@ -34,3 +41,4 @@ const schema = yup.object().shape({
 
   <button type="submit" disabled={isSubmitting}>Submit</button>
 </Form>
+<h1>{location}</h1>
