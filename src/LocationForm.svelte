@@ -2,7 +2,7 @@
 import { Form, Input } from 'sveltejs-forms';
 import * as yup from 'yup';
 
-  import { getPosition } from './utils/helper'
+import { getPosition } from './utils/helper'
 
 let location;
 
