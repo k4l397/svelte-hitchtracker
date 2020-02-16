@@ -1,44 +1,74 @@
 <script>
-import { Form, Input } from 'sveltejs-forms';
 import * as yup from 'yup';
-
 import { getPosition } from './utils/helper'
 
-let location;
+const formValues = {
+  location: '',
+  message: ''
+};
 
-const handleSubmit = ({ detail: { values, setSubmitting, resetForm } }) => {
-  setTimeout(() => {
-    console.log(values);
-    setSubmitting(false);
-    resetForm();
-  }, 2000)
-}
+let currentError = -1;
+let errors = null;
+  
+const schema = yup.object().shape({
+    location: yup.string().required(),
+    message: yup.string().required()
+  });
+
+const handleSubmit = async () => {
+  schema.validate(formValues, {abortEarly: false})
+    .then((valid) => {
+      errors = null;
+      console.log(valid);
+    })
+    .catch((err) => {
+      errors = err;
+      console.log(err)
+    })
+};
 
 const handleReset = () => {
-  console.log("form reset.")
-}
+  console.log('form reset.')
+};
 
-const schema = yup.object().shape({
-  location: yup.string().required(),
-  message: yup.string().required()
-})
 
 const getLocation = () => {
   naviagor.geoLocation.getCurrentPosition
-}
+};
 </script>
 
-<Form
-  {schema}
-  validateOnBlur={true}
-  validateOnChange={true}
-  on:submit={handleSubmit}
-  let:isSubmitting
-  let:isValid
->
-  <Input name ="location" placeholder="Location" />
-  <Input name ="message" placeholder="Message" />
+<style>
+form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
 
-  <button type="submit" disabled={isSubmitting}>Submit</button>
-</Form>
-<h1>{location}</h1>
+input {
+  margin: 0.5em 0 0 0
+}
+
+p {
+  margin: 0
+}
+
+button {
+  margin-top: 0.5em
+}
+</style>
+
+<form autocomplete="off" on:submit|preventDefault={handleSubmit}>
+  <input  name="location" type="text" bind:value={formValues.location} placeholder="Location" />
+  {#if errors !== null &&
+    -1 !== (currentError =
+    errors.inner.reduce((errorIndex, err, currentIndex) => {return err.path === "location" ? currentIndex : errorIndex}, -1 ))}
+    <p>{errors.inner[currentError].message}</p>
+  {/if}
+  <input  name="message" type="text" bind:value={formValues.message} placeholder="Message" />
+  {#if errors !== null &&
+    -1 !== (currentError =
+    errors.inner.reduce((errorIndex, err, currentIndex) => {return err.path === "message" ? currentIndex : errorIndex}, -1 ))}
+    <p>{errors.inner[currentError].message}</p>
+  {/if}
+  <button type="submit">Send Update</button>
+</form>
